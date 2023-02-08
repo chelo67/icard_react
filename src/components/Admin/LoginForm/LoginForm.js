@@ -11,7 +11,7 @@ export function LoginForm() {
         validationSchema: Yup.object(validationSchema()),
         onSubmit: async (formValue) => {
             try {
-                const response = await loginApi(formValue)
+                const response = await loginApi(formValue);
                 const { access } = response;
                 console.log(access);
             } catch (error) {
