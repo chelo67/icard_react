@@ -3,10 +3,14 @@ import {Button, Form} from "semantic-ui-react"
 import {useFormik} from "formik"
 import * as Yup from "yup"
 import {toast} from "react-toastify"
+import {useAuth} from '../../../hooks'
 import {loginApi} from "../../../api/user"
+
 import "./LoginForm.scss"
 
 export function LoginForm() {
+    const {login} = useAuth();
+
     const formik = useFormik({
         initialValues: initialValues(),
         validationSchema: Yup.object(validationSchema()),
@@ -14,7 +18,7 @@ export function LoginForm() {
             try {
                 const response = await loginApi(formValue);
                 const { access } = response;
-                console.log(access);
+                login(access)
             } catch (error) {
                 toast.error(error.message)
             }
