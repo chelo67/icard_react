@@ -5,8 +5,7 @@ export function HomeAdmin() {
     const {logout} = useAuth();
     return (
         <div>
-            <div>Home Admin</div>
-            <button onClick={logout}>Cerrar sesión</button>
+            <h1>Home Admin</h1>
         </div>
     )
 }
