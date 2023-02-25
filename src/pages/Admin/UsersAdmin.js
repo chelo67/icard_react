@@ -5,24 +5,44 @@ import {ModalBasic} from '../../components/Common'
 import {useUser} from '../../hooks'
 
 export function UsersAdmin() {
-    const { loading, users, getUsers } = useUser();
-    
+    const { loading, users, getUsers, deleteUser } = useUser();
     const [titleModal, setTitleModal] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [contentModal, setContentModal] = useState(null);
+    const [refetch, setRefetch] = useState(false)
     
 
     useEffect(() => {
       getUsers();
-    }, []);
+    }, [refetch]);
 
     const openCloseModal = () => setShowModal((prev) => !prev);
+    const onRefetch= () => setRefetch((prev) => !prev);
 
     const addUser = () => {
         setTitleModal("Nuevo Usuario");
-        setContentModal(<AddEditUserForm />)
+        setContentModal(<AddEditUserForm onClose={openCloseModal} onRefetch={onRefetch}  />)
         openCloseModal();
     };
+    
+    const updateUser = (data) => {
+        setTitleModal("Editar Usuario");
+        setContentModal(<AddEditUserForm onClose={openCloseModal} onRefetch={onRefetch} user={data} />);
+        openCloseModal();
+    };
+
+    const onDeleteUser = async (data) => {
+        const result = window.confirm(`¿Eliminar usuario ${data.email}?`);
+
+        if (result) {
+            try {
+                await deleteUser(data.id);
+                onRefetch();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
 
     return (
         <>
@@ -36,7 +56,11 @@ export function UsersAdmin() {
                     Cargando...
                 </Loader>
             ) : (
-                <TableUsers users={users} />        
+                <TableUsers 
+                    users={users} 
+                    updateUser={updateUser} 
+                    onDeleteUser={onDeleteUser} 
+                />        
             )}
 
             <ModalBasic 
