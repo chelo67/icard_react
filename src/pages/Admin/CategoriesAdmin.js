@@ -8,24 +8,35 @@ export function CategoriesAdmin() {
     const [showModal, setShowModal] = useState(false);
     const [titleModal, setTitleModal] = useState(null);
     const [contentModal, setcontentModal] = useState(null)
-
-    const { loading, categories, getCategories } = useCategory();
-    
-    console.log(categories);
+    const [refetch, setRefetch] = useState(false);
+    const { loading, categories, getCategories, deleteCategory } = useCategory();
     
     useEffect(() => {
         getCategories()
-    }, []);
+    }, [refetch]);
 
     const openCloseModal = () => setShowModal(prev => !prev);
+    const onRefetch = () => setRefetch(prev => !prev);
 
     const addCategory = () => {
         setTitleModal("Nuevo categoria");
-        setcontentModal(<AddEditCategoryForm />);
+        setcontentModal(<AddEditCategoryForm onClose={openCloseModal} onRefetch={onRefetch} />);
         openCloseModal()
     }
 
-    
+    const updateCategory = (data) => {
+        setTitleModal("Actualizar categoria");
+        setcontentModal(<AddEditCategoryForm onClose={openCloseModal} onRefetch={onRefetch} category={data} />);
+        openCloseModal();
+    }
+
+    const onDeleteCategory = async (data) => {
+        const result = window.confirm(`¿Eliminar categoría ${data.title}?`);
+        if (result) {
+            await deleteCategory(data.id);
+            onRefetch();
+        }
+    };
 
     return (
         <>
@@ -39,7 +50,11 @@ export function CategoriesAdmin() {
 
                 </Loader>
             ) : (
-                    <TableCategoryAdmin categories={categories} />
+                    <TableCategoryAdmin 
+                        categories={categories} 
+                        updateCategory={updateCategory}
+                        deleteCategory={onDeleteCategory}
+                    />
             )}
 
             <ModalBasic

@@ -2,19 +2,29 @@ import React, {useState, useCallback} from 'react'
 import { Form, Image, Button } from 'semantic-ui-react'
 import { useDropzone } from 'react-dropzone'
 import { useFormik } from 'formik'
+import {useCategory} from '../../../../hooks'
 import * as Yup from 'yup'
+
 import './AddEditCategoryForm.scss'
 
-export function AddEditCategoryForm() {
-    const [previewImage, setPreviewImage] = useState(null)
+export function AddEditCategoryForm(props) {
+    const {onClose, onRefetch, category} = props;
+    const [previewImage, setPreviewImage] = useState(category?.image || null);
+    const {addCategory, updateCategory} = useCategory();
 
     const formik = useFormik({
-        initialValues: initialValues(),
-        validationSchema: Yup.object(newSchema()),
+        initialValues: initialValues(category),
+        validationSchema: Yup.object(category ? updateSchema() : newSchema()),
         validateOnChange: false,
-        onSubmit: (formValue) => {
-            console.log("formulario enviado...");
-            console.log(formValue);
+        onSubmit: async (formValue) => {
+            try {
+                if (category) await updateCategory(category.id, formValue);
+                else await addCategory(formValue);
+                onRefetch();
+                onClose();   
+            } catch (error) {
+                console.error(error);
+            }
         }
     })
 
@@ -47,21 +57,21 @@ export function AddEditCategoryForm() {
             color={formik.errors.image && "red"}
                 {...getRootProps()}
             >
-                Subir Imagen
+                {previewImage ? "Cambiar imagen" : "Subir Imagen"}
             </Button>
 
             <input {...getInputProps()} />
 
             <Image src={previewImage} fluid/>
 
-            <Button type="submit" primary fluid content="crear" />
+            <Button type="submit" primary fluid content={category ? "Actualizar" : "Crear"} />
         </Form>
     )
 }
 
-function initialValues() {
+function initialValues(data) {
     return {
-        title: "",
+        title: data?.title || "",
         image: "",
     }
 }
@@ -70,5 +80,12 @@ function newSchema() {
     return {
         title: Yup.string().required(true),
         image: Yup.string().required(true),
+    }
+}
+
+function updateSchema() {
+    return {
+        title: Yup.string().required(true),
+        image: Yup.string(),
     }
 }
