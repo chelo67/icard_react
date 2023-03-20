@@ -1,5 +1,11 @@
 import {AdminLayout} from '../layouts'
-import {OrdersAdmin, UsersAdmin, CategoriesAdmin, ProductAdmin, TablesAdmin} from '../pages/Admin'
+import {OrdersAdmin, 
+    UsersAdmin, 
+    CategoriesAdmin, 
+    ProductAdmin, 
+    TablesAdmin,
+    TablesDetailsAdmin
+} from '../pages/Admin'
 
 const routesAdmin = [
     {
@@ -30,6 +36,12 @@ const routesAdmin = [
         path: '/admin/tables',
         layout: AdminLayout,
         component: TablesAdmin,
+        exact: true,
+    },
+    {
+        path: '/admin/table/:id',
+        layout: AdminLayout,
+        component: TablesDetailsAdmin,
         exact: true,
     },
 ]
